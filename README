@@ -1,0 +1,10 @@
+Authorization -- A plugin for authorization in a RESTful application
+
+Authorization allows you to specify access policies in your controllers. The plugin assumes a number of things about the application.
+
+* If a user has authenticated with the application, it's stored in <tt>@authenticated</tt>. The method of authentication doesn't matter.
+* <tt>@authenticated</tt> has either a <tt>role</tt> attribute or a number of methods to query for the role: <tt>admin?</tt>, <tt>editor?</tt>, <tt>guest?</tt>.
+
+The plugin was written with a RESTful application in mind, but it will also work with old-style controllers.
+
+The best place to start learning more is the <tt>examples</tt> directory in the source.
