@@ -16,7 +16,7 @@ require 'resource'
 require 'init'
 
 ActionController::Base.logger = nil
-ActionController::Base.ignore_missing_templates = false
+ActionController::Base.ignore_missing_templates = false if ActionController::Base.respond_to?(:ignore_missing_templates)
 ActionController::Routing::Routes.reload rescue nil
 
 # TEST CONTROLLERS
@@ -277,5 +277,9 @@ class ControllerTest < Test::Unit::TestCase
     @controller.authenticated = nil
     get :index
     assert_response :success
+  end
+  
+  def test_visibility_of_added_methods
+    assert @acontroller.public_methods.grep(/access_allowed_for/).empty?
   end
 end

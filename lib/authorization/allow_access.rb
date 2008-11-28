@@ -47,7 +47,10 @@ module Authorization
     #     @authenticated.organization.id == params[:organization_id].to_i
     #   end
     def allow_access(*args, &block)
-      self.class_inheritable_accessor(:access_allowed_for) unless self.respond_to?(:access_allowed_for)
+      unless self.respond_to?(:access_allowed_for)
+        self.class_inheritable_accessor(:access_allowed_for)
+        send(:protected, :access_allowed_for, :access_allowed_for=)
+      end
       self.access_allowed_for ||= HashWithIndifferentAccess.new
       if args.first.kind_of?(Hash) || args.empty?
         self.access_allowed_for[:all] ||= []
