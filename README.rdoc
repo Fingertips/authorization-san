@@ -1,4 +1,4 @@
-Authorization-san -- A plugin for authorization in a RESTful application
+= Authorization-San
 
 Authorization-san allows you to specify access policies in your controllers. The plugin assumes a number of things about the application.
 

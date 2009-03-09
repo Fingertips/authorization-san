@@ -8,7 +8,10 @@ Rake::TestTask.new do |t|
   t.verbose = true
 end
 
-Rake::RDocTask.new do |rd|
-  rd.main = "README"
-  rd.rdoc_files.include("README", "lib/**/*")
+namespace :docs do
+  Rake::RDocTask.new('generate') do |rdoc|
+    rdoc.main = "README.rdoc"
+    rdoc.rdoc_files.include('README.rdoc', 'lib/authorization', 'lib/authorization/allow_access.rb', 'lib/authorization/block_access.rb')
+    rdoc.options << "--all" << "--charset" << "utf-8"
+  end
 end
