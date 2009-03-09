@@ -10,8 +10,9 @@ end
 
 namespace :docs do
   Rake::RDocTask.new('generate') do |rdoc|
+    rdoc.title = 'Authorization-San'
     rdoc.main = "README.rdoc"
-    rdoc.rdoc_files.include('README.rdoc', 'lib/authorization', 'lib/authorization/allow_access.rb', 'lib/authorization/block_access.rb')
+    rdoc.rdoc_files.include('README.rdoc', 'lib/authorization')
     rdoc.options << "--all" << "--charset" << "utf-8"
   end
 end

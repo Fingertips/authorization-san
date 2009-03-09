@@ -3,8 +3,19 @@
 Authorization-san allows you to specify access policies in your controllers. The plugin assumes a number of things about the application.
 
 * If a user has authenticated with the application, it's stored in <tt>@authenticated</tt>. The method of authentication doesn't matter.
-* <tt>@authenticated</tt> has either a <tt>role</tt> attribute or a number of methods to query for the role: <tt>admin?</tt>, <tt>editor?</tt>, <tt>guest?</tt>.
+* <tt>@authenticated</tt> has either a <tt>role</tt> attribute or a number of methods to query for the role: <tt>admin?</tt>, <tt>editor?</tt>, <tt>guest?</tt>. When the <tt>@authenticated</tt> object doesn't have role methods it's 
 
-The plugin was written with a ReSTful application in mind, but it will also work with old-style controllers.
+== What does it look like?
+
+  class BooksController < ActionController::Base
+    # Visitors can see list of books and book pages
+    allow_access :all, :only => [:index, :show]
+    # An editor can create new books, but…
+    allow_access :editor, :only => [:new, :create]
+    # …she can only update her own books.
+    allow_access(:editor, :only => [:edit, :update]) { @book = @authenticated.books.find(params[:id]) }
+    # Admin users can do it all.
+    allow_access :admin
+  end
 
 The best place to start learning more is the <tt>examples</tt> directory in the source.
