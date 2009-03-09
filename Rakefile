@@ -15,3 +15,17 @@ namespace :docs do
     rdoc.options << "--all" << "--charset" << "utf-8"
   end
 end
+
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |s|
+    s.name = "authorization-san"
+    s.description = "A plugin for authorization in a ReSTful application."
+    s.summary = "A plugin for authorization in a ReSTful application."
+    s.email = "manfred@fngtps.com"
+    s.homepage = "http://fingertips.github.com"
+    
+    s.authors = ["Manfred Stienstra"]
+    s.files = %w(lib/authorization.rb lib/authorization/allow_access.rb lib/authorization/block_access.rb rails/init.rb README.rdoc LICENSE)
+  end
+end
