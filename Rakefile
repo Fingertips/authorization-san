@@ -29,4 +29,13 @@ begin
     s.authors = ["Manfred Stienstra"]
     s.files = %w(lib/authorization.rb lib/authorization/allow_access.rb lib/authorization/block_access.rb rails/init.rb README.rdoc LICENSE)
   end
+rescue LoadError
+end
+
+begin
+  require 'jewelry_portfolio/tasks'
+  JewelryPortfolio::Tasks.new do |p|
+    p.account = 'Fingertips'
+  end
+rescue LoadError
 end
