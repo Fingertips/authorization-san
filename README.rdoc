@@ -2,8 +2,8 @@
 
 Authorization-san allows you to specify access policies in your controllers. The plugin assumes a number of things about the application.
 
-* If a user has authenticated with the application, it's stored in <tt>@authenticated</tt>. The method of authentication doesn't matter.
-* <tt>@authenticated</tt> has either a <tt>role</tt> attribute or a number of methods to query for the role: <tt>admin?</tt>, <tt>editor?</tt>, <tt>guest?</tt>. When the <tt>@authenticated</tt> object doesn't have role methods it's 
+* If a user has authenticated with the application, it's stored in <tt>@authenticated</tt>. The method of authentication doesn't matter. It also doesn't matter what you put in @authenticated, as long as it's truthy.
+* <tt>@authenticated</tt> has either a <tt>role</tt> attribute or a number of methods to query for the role: <tt>admin?</tt>, <tt>editor?</tt>, <tt>guest?</tt>. When the <tt>@authenticated</tt> object doesn't have role methods you can't use role based authentication rules, but the rest still works.
 
 == What does it look like?
 
