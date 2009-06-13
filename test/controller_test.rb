@@ -1,100 +1,17 @@
 require File.expand_path('../test_helper', __FILE__)
 
-ActionController::Base.logger = nil
-ActionController::Base.ignore_missing_templates = false if ActionController::Base.respond_to?(:ignore_missing_templates)
 ActionController::Routing::Routes.reload rescue nil
 
-# TEST CONTROLLERS
-
-class ApplicationController < ActionController::Base
-  session :off
-  before_filter :block_access
-    
-  def access_forbidden
-    response.headers['Status'] = '403 Forbidden'
-    render :text => '403 Forbidden', :status => 403
-    false
-  end
-  
-  # Purely for testing
-  def authenticated=(value)
-    @authenticated = value
-  end
-  
-  def logger
-    @logger ||= Logger.new('/dev/null')
-  end
-  
-  def rescue_action(e) raise e end;
-end
-
-class UsersController < ApplicationController
-  allow_access :admin
-  allow_access :editor, :only => [:index, :show]
-  allow_access(:guest, :only => :guest) { params[:action] == 'guest' }
-  allow_access :tester, :only => :show, :user_resource => true
-  allow_access :reader, :only => :show, :scope => :organization
-  allow_access :only => :listing
-  allow_access :only => :react
-  
-  %w(index show guest listing react).each do |name|
-    define_method(name) { head 200 }
-  end
-end
-
-class PublicController < ApplicationController
-  allow_access
-  
-  def index; head 200; end
-end
-
-class AuthenticatedController < ApplicationController
-  allow_access :authenticated
-  
-  def index; head 200; end
-end
-
-class BrokenBlockController < ApplicationController
-  allow_access(:only => :index) { nil.unknown_method }
-  allow_access :only => :show
-    
-  %w(index show).each do |name|
-    define_method(name) { head 200 }
-  end
-end
-
-class MultipleRolesController < ApplicationController
-  allow_access :a, :b
-  allow_access [:c, :d]
-  allow_access [:e, :f], :only => :index
-  allow_access :g, :h, :only => :show
-  
-  %w(index show).each do |name|
-    define_method(name) { head 200 }
-  end
-end
-
-class FragileBlockController < ApplicationController
-  allow_access :authenticated do
-    @authenticated.not_there
-  end
-  
-  def index; head 200; end
-end
-
-class ComplicatedController < ApplicationController
-  allow_access :all, :only => :index
-  allow_access :authenticated, :only => [:show, :edit, :update], :user_resource => true
-  
-  %w(index show edit update).each do |name|
-    define_method(name) { head 200 }
-  end
-end
-
-# TESTCASES
+require 'controllers/application_controller'
+require 'controllers/authenticated_controller'
+require 'controllers/broken_block_controller'
+require 'controllers/complicated_controller'
+require 'controllers/fragile_block_controller'
+require 'controllers/multiple_roles_controller'
+require 'controllers/public_controller'
+require 'controllers/users_controller'
 
 class ControllerTest < ActionController::TestCase
-  
   def setup
     @controller = UsersController.new
     @controller.authenticated = Resource.new :role => :admin
@@ -201,7 +118,7 @@ class ControllerTest < ActionController::TestCase
     get :index
     assert_response 200
   end
-
+  
   {
     [:a, :index] => true,
     [:b, :index] => true,

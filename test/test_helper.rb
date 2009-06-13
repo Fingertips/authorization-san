@@ -32,6 +32,8 @@ module AuthorizationSanTest
       
       require File.join(PLUGIN_ROOT, 'rails', 'init')
       require File.join(PLUGIN_ROOT, 'test', 'resource')
+      
+      $:.unshift(File.join(PLUGIN_ROOT, 'test'))
     end
     
     def self.start
