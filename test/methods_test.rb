@@ -1,5 +1,7 @@
 require File.expand_path('../test_helper', __FILE__)
 
+require 'models/resource'
+
 class MethodsTest < ActiveSupport::TestCase
   include Authorization::BlockAccess
   attr_accessor :params, :access_allowed_for
