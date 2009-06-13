@@ -1,4 +1,4 @@
-require File.expand_path('../test_helper', __FILE__)
+require File.expand_path('../../test_helper', __FILE__)
 
 require 'models/resource'
 
@@ -17,7 +17,7 @@ class MethodsTest < ActiveSupport::TestCase
   def do_true
     true
   end
-
+  
   def test_action_allowed
     @access_allowed_for = {
       :admin => [{
@@ -66,7 +66,7 @@ class MethodsTest < ActiveSupport::TestCase
       [:show, :unknown] => false
     })
   end
-
+  
   def test_action_allowed_nil
     @access_allowed_for = nil
     params = HashWithIndifferentAccess.new :action => :something
@@ -135,7 +135,7 @@ class MethodsTest < ActiveSupport::TestCase
       :all => false
     })
   end
-
+  
   def test_access_forbidden
     assert_equal false, access_forbidden
   end
@@ -182,12 +182,12 @@ class MethodsTest < ActiveSupport::TestCase
       [:complex, :unknown] => false
       })
   end
-
+  
   def test_block_access_closed
     @access_allowed_for = {}
     assert_equal false, block_access
   end
-
+  
   def test_block_access_nil
     @access_allowed_for = nil
     assert_raises(ArgumentError) { block_access }
@@ -208,7 +208,7 @@ class MethodsTest < ActiveSupport::TestCase
       }]}
     @authenticated = Resource.new :'special?' => true, :'admin?' => true
     @params = HashWithIndifferentAccess.new :action => :new
-    assert !block_access    
+    assert !block_access
   end
   
   def test_block_access_on_object_with_accessor_dined_on_role
