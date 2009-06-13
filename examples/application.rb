@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   # before any sensitive processing occurs.
   before_filter :find_authenticated, :block_access
 
-  protected
+  private
 
   # Find the authenticated user
   def find_authenticated

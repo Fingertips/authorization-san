@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   before_filter :find_authenticated, :block_access
 
-  protected
+  private
 
   # Find the authenticated user, cookie based authentication for browser users and HTTP Basic Authentication for
   # API users. Note that this does not allow you to get HTML resources when logged in through Basic Auth.

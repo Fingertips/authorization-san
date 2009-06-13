@@ -16,7 +16,7 @@ class PagesController < ApplicationController
 
   def show; end
 
-  protected
+  private
 
   def find_user
     @user = User.find params[:user_id]

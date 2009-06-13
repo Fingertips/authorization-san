@@ -1,4 +1,4 @@
-# The pages controller is a nest resource under users (ie. /users/12/pages)
+# The pages controller is nested under users (ie. /users/12/pages)
 class PagesController < ApplicationController
   # Users can only reach pages nested under their user_id. Note that this doesn't define the complete access policy,
   # some of the authorization is still done in the actions. See pages_controller_with_full_policy.rb for an example
@@ -17,7 +17,7 @@ class PagesController < ApplicationController
     head :forbidden
   end
 
-  protected
+  private
 
   def find_user
     @user = User.find params[:user_id]
