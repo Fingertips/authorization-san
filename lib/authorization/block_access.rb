@@ -13,7 +13,7 @@ module Authorization
         roles = []
         roles << @authenticated.role if @authenticated.respond_to?(:role)
         access_allowed_for.keys.each do |role|
-           roles << role.to_s if @authenticated.respond_to?("#{role}?") and @authenticated.__send__("#{role}?")
+           roles << role.to_s if @authenticated.respond_to?("#{role}?") and @authenticated.send("#{role}?")
         end
         # Check if any of the roles give her access
         roles.each do |role|
@@ -97,7 +97,7 @@ module Authorization
         if scope = directives[:scope]
           assoc_id = params["#{scope}_id"].to_i
           begin
-            object_id = user.__send__(scope).id.to_i
+            object_id = user.send(scope).id.to_i
           rescue NoMethodError
             return false
           end

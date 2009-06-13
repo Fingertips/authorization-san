@@ -59,7 +59,7 @@ module Authorization
           :block => block
         }
       else
-        directives = args.last.kind_of?(Hash) ? args.pop : {}
+        directives = args.extract_options!
         roles = args.flatten
         if roles.delete(:authenticated) or roles.delete('authenticated')
           roles = [:all] if roles.empty?
