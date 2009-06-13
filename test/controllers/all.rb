@@ -1,0 +1,6 @@
+require 'controllers/application_controller'
+require 'controllers/authenticated_controller'
+require 'controllers/broken_block_controller'
+require 'controllers/public_controller'
+require 'controllers/multiple_roles_controller'
+require 'controllers/users_controller'

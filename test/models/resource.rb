@@ -1,5 +1,5 @@
 class Resource
-  def initialize(hash)
+  def initialize(hash={})
     @attributes = {}
     hash.each do |k,v|
       self.send("#{k}=", v)

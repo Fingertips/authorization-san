@@ -3,6 +3,6 @@ class ComplicatedController < ApplicationController
   allow_access :authenticated, :only => [:show, :edit, :update], :user_resource => true
   
   %w(index show edit update).each do |name|
-    define_method(name) { head 200 }
+    define_method(name) { head :ok }
   end
 end
