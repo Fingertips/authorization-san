@@ -8,6 +8,6 @@ class UsersController < ApplicationController
   allow_access :only => :react
   
   %w(index show guest listing react).each do |name|
-    define_method(name) { head 200 }
+    define_method(name) { head :ok }
   end
 end

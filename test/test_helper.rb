@@ -37,6 +37,7 @@ module AuthorizationSanTest
     
     def self.start
       load_dependencies
+      ActionController::Routing::Routes.reload rescue nil
     end
   end
 end

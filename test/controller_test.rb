@@ -1,7 +1,5 @@
 require File.expand_path('../test_helper', __FILE__)
 
-ActionController::Routing::Routes.reload rescue nil
-
 require 'controllers/application_controller'
 require 'controllers/authenticated_controller'
 require 'controllers/broken_block_controller'
@@ -18,69 +16,6 @@ class ControllerTest < ActionController::TestCase
     @controller.authenticated = Resource.new :role => :admin
     @request = ActionController::TestRequest.new
     @response = ActionController::TestResponse.new
-  end
-  
-  def test_structure
-    assert @controller.__send__(:access_allowed_for)
-  end
-  
-  {
-    [:admin, :index] => true,
-    [:admin, :show] => true,
-    [:admin, :guest] => true,
-    [:admin, :listing] => true,
-    [:admin, :react] => true,
-    [:editor, :index] => true,
-    [:editor, :guest] => false,
-    [:editor, :listing] => true,
-    [:editor, :react] => true,
-    [:guest, :index] => false,
-    [:guest, :guest] => true,
-    [:guest, :listing] => true,
-    [:guest, :react] => true,
-    [:user, :listing] => true,
-    [:user, :react] => true,
-    [:user, :index] => false,
-  }.each do |pair, truth|
-    define_method "test_access_#{pair.join('_')}" do
-      @controller.authenticated = Resource.new :role => pair.first
-      get pair.last
-      if truth
-        assert_response :success
-      else
-        assert_response 403
-      end
-    end
-  end
-  
-  def test_access_with_user_resource
-    @controller.authenticated = Resource.new :role => :tester, :id => 1
-    get :show, :id => 1
-    assert_response :success
-  end
-  
-  def test_access_with_user_denied
-    @controller.authenticated = Resource.new :role => :tester, :id => 1
-    get :show, :id => 2
-    assert_response 403
-  end
-  
-  def test_access_with_action_denied
-    @controller.authenticated = Resource.new :role => :tester, :id => 1
-    get :unknown, :id => 1
-    assert_response 403
-  end
-  
-  def test_access_with_scope
-    @controller.authenticated = Resource.new :role => :reader, :organization => Resource.new(:id => 1)
-    get :show, :organization_id => 1
-    assert_response :success
-  end
-  
-  def test_access_with_scope_denied
-    @controller.authenticated = Resource.new :role => :reader, :organization => Resource.new(:id => 1)
-    get :show, :organization_id => 2
-    assert_response 403
   end
   
   def test_public_controller

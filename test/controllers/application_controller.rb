@@ -1,15 +1,11 @@
 class ApplicationController < ActionController::Base
+  attr_accessor :authenticated
+  
   before_filter :block_access
   
   def access_forbidden
-    response.headers['Status'] = '403 Forbidden'
-    render :text => '403 Forbidden', :status => 403
+    head :forbidden
     false
-  end
-  
-  # Purely for testing
-  def authenticated=(value)
-    @authenticated = value
   end
   
   def logger
