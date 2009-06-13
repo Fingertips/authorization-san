@@ -1,19 +1,4 @@
-$:.unshift File.dirname(__FILE__) + '/../lib'
-$:.unshift(File.dirname(__FILE__))
-
-begin
-  require 'rubygems'
-rescue LoadError
-end
-require 'active_support'
-require 'action_controller'
-require 'action_controller/test_process'
-
-require 'ostruct'
-require 'test/unit'
-
-require 'resource'
-require 'init'
+require File.expand_path('../test_helper', __FILE__)
 
 ActionController::Base.logger = nil
 ActionController::Base.ignore_missing_templates = false if ActionController::Base.respond_to?(:ignore_missing_templates)
@@ -108,7 +93,7 @@ end
 
 # TESTCASES
 
-class ControllerTest < Test::Unit::TestCase
+class ControllerTest < ActionController::TestCase
   
   def setup
     @controller = UsersController.new

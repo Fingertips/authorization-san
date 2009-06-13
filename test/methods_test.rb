@@ -1,16 +1,6 @@
-$:.unshift(File.dirname(__FILE__) + '/../lib')
-$:.unshift(File.dirname(__FILE__))
+require File.expand_path('../test_helper', __FILE__)
 
-begin
-  require 'rubygems'
-rescue LoadError
-end
-require 'active_support'
-require 'test/unit'
-require 'authorization'
-require 'resource'
-
-class MethodsTest < Test::Unit::TestCase
+class MethodsTest < ActiveSupport::TestCase
   include Authorization::BlockAccess
   attr_accessor :params, :access_allowed_for
   
