@@ -13,12 +13,13 @@ module AuthorizationSanTest
     end
     
     def self.load_dependencies
+      $stdout.write('Loading Rails from ')
       if rails_directory
-        puts "Using Ruby on Rails from #{rails_directory}"
+        puts rails_directory
         $:.unshift(File.join(rails_directory, 'activesupport', 'lib'))
         $:.unshift(File.join(rails_directory, 'activerecord', 'lib'))
       else
-        puts "Using Ruby on Rails from Rubygems"
+        puts 'rubygems'
         require 'rubygems' rescue LoadError
       end
       
@@ -28,10 +29,9 @@ module AuthorizationSanTest
       require 'action_controller'
       require 'action_controller/test_process'
       
-      $:.unshift(File.join(PLUGIN_ROOT, 'lib'))
-      
       require File.join(PLUGIN_ROOT, 'rails', 'init')
       
+      $:.unshift(File.join(PLUGIN_ROOT, 'lib'))
       $:.unshift(File.join(PLUGIN_ROOT, 'test'))
     end
     
