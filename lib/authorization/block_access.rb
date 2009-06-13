@@ -1,7 +1,7 @@
 module Authorization
   module BlockAccess
     protected
-    
+
     # Block access to all actions in the controller, designed to be used as a <tt>before_filter</tt>.
     #   class ApplicationController < ActionController::Base
     #     before_filter :block_access
