@@ -20,7 +20,11 @@ module AuthorizationSanTest
         $:.unshift(File.join(rails_directory, 'activerecord', 'lib'))
       else
         puts 'rubygems'
-        require 'rubygems' rescue LoadError
+        begin
+          require 'rubygems'
+          gem 'rails', '< 3.0'
+        rescue LoadError
+        end
       end
       
       require 'test/unit'
