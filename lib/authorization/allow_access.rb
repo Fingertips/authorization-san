@@ -49,29 +49,29 @@ module Authorization
     def allow_access(*args, &block)
       unless self.respond_to?(:access_allowed_for)
         self.class_inheritable_accessor(:access_allowed_for)
+        self.access_allowed_for = HashWithIndifferentAccess.new
         send(:protected, :access_allowed_for, :access_allowed_for=)
       end
-      self.access_allowed_for ||= HashWithIndifferentAccess.new
+      
       if args.first.kind_of?(Hash) || args.empty?
-        self.access_allowed_for[:all] ||= []
-        self.access_allowed_for[:all] << {
-          :directives => args.first || {},
-          :block => block
-        }
+        directives = args.first || {}
+        roles = ['all']
       else
         directives = args.extract_options!
-        roles = args.flatten
-        if roles.delete(:authenticated) or roles.delete('authenticated')
-          roles = [:all] if roles.empty?
-          directives[:authenticated] = true
-        end
-        roles.each do |role|
-          self.access_allowed_for[role.to_s] ||= []
-          self.access_allowed_for[role.to_s] << {
-            :directives => directives,
-            :block => block
-          }
-        end
+        roles = args.flatten.map { |role| role.to_s }
+      end
+      
+      if roles.delete(:authenticated) or roles.delete('authenticated')
+        directives[:authenticated] = true
+        roles = ['all'] if roles.empty?
+      end
+      
+      roles.each do |role|
+        self.access_allowed_for[role] ||= []
+        self.access_allowed_for[role] << {
+          :directives => directives,
+          :block => block
+        }
       end
     end
   end
