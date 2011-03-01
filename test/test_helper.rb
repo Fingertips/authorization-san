@@ -30,10 +30,10 @@ module AuthorizationSanTest
       require 'action_controller'
       require 'action_controller/test_process'
       
-      require File.join(PLUGIN_ROOT, 'rails', 'init')
-      
       $:.unshift(File.join(PLUGIN_ROOT, 'lib'))
       $:.unshift(File.join(PLUGIN_ROOT, 'test'))
+      
+      require File.join(PLUGIN_ROOT, 'rails', 'init')
     end
     
     def self.start
