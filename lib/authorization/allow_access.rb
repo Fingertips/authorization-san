@@ -49,7 +49,7 @@ module Authorization
     def allow_access(*args, &block)
       unless self.respond_to?(:access_allowed_for)
         self.class_inheritable_accessor(:access_allowed_for)
-        self.access_allowed_for = HashWithIndifferentAccess.new
+        self.access_allowed_for = {}.with_indifferent_access
         send(:protected, :access_allowed_for, :access_allowed_for=)
       end
       
@@ -58,7 +58,7 @@ module Authorization
         roles = ['all']
       else
         directives = args.extract_options!
-        roles = args.flatten.map { |role| role.to_s }
+        roles = args.flatten
       end
       
       if roles.delete(:authenticated) or roles.delete('authenticated')

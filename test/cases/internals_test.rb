@@ -4,7 +4,8 @@ require 'models/resource'
 
 class MethodsTest < ActiveSupport::TestCase
   include Authorization::BlockAccess
-  attr_accessor :params, :access_allowed_for
+  
+  attr_reader :access_allowed_for, :params
   
   def logger
     @logger ||= Logger.new('/dev/null')
@@ -18,7 +19,7 @@ class MethodsTest < ActiveSupport::TestCase
     true
   end
   
-  def test_action_allowed
+  test "action_allowed? sanity" do
     @access_allowed_for = {
       :admin => [{
           :directives => {}
@@ -49,7 +50,7 @@ class MethodsTest < ActiveSupport::TestCase
       })
   end
   
-  def test_action_allowed_open
+  test "action_allowed? sanity with directives" do
     @access_allowed_for = {:all => [{:directives => {}}] }
     assert_action_allowed({
       [:admin, :index] => false,
@@ -58,7 +59,7 @@ class MethodsTest < ActiveSupport::TestCase
     })
   end
   
-  def test_action_allowed_closed
+  test "action_allowed? sanity without directives" do
     @access_allowed_for = {}
     assert_action_allowed({
       [:admin, :index] => false,
@@ -67,13 +68,25 @@ class MethodsTest < ActiveSupport::TestCase
     })
   end
   
-  def test_action_allowed_nil
+  test "action_allowed? breaks when no rules are defined" do
     @access_allowed_for = nil
     params = HashWithIndifferentAccess.new :action => :something
     assert_raises(ArgumentError) { action_allowed?(params, :something) }
   end
   
-  def test_resource_allowed_user_resource
+  test "resource_allowed? sanity with :authenticated directive" do
+    @access_allowed_for = {
+      :all => [{
+        :directives => {:authenticated => true}
+      }]
+    }
+    assert !resource_allowed?({}, :admin, nil)
+    assert !resource_allowed?({}, :admin, true)
+    assert resource_allowed?({}, :all, true)
+    assert resource_allowed?({:action => :edit}, :all, true)
+  end
+  
+  test "resource_allowed? sanity with :user_resource directive" do
     @access_allowed_for = {
       :user => [{
         :directives => {:only => [:index, :show], :user_resource => true}
@@ -93,7 +106,7 @@ class MethodsTest < ActiveSupport::TestCase
     })
   end
   
-  def test_resource_allowed_scope
+  test "resource_allowed? sanity with :scope directive" do
     @access_allowed_for = {
       :user => [{
         :directives => {:only => [:index, :show], :scope => :organization}
@@ -113,19 +126,7 @@ class MethodsTest < ActiveSupport::TestCase
     })
   end
   
-  def test_resource_allowed_authenticated
-    @access_allowed_for = {
-      :all => [{
-        :directives => {:authenticated => true}
-      }]
-    }
-    assert !resource_allowed?({}, :admin, nil)
-    assert !resource_allowed?({}, :admin, true)
-    assert resource_allowed?({}, :all, true)
-    assert resource_allowed?({:action => :edit}, :all, true)
-  end
-  
-  def test_block_allowed
+  test "block_allowed? sanity" do
     @access_allowed_for = {
       :admin => [{:block => MethodsTest.instance_method(:do_true)}],
       :all => [{:block => MethodsTest.instance_method(:do_false)}]
@@ -136,11 +137,7 @@ class MethodsTest < ActiveSupport::TestCase
     })
   end
   
-  def test_access_forbidden
-    assert_equal false, access_forbidden
-  end
-  
-  def test_block_access
+  test "block_access sanity" do
     @access_allowed_for = {
       :admin => [{
           :directives => {}
@@ -183,56 +180,68 @@ class MethodsTest < ActiveSupport::TestCase
       })
   end
   
-  def test_block_access_closed
-    @access_allowed_for = {}
-    assert_equal false, block_access
-  end
-  
-  def test_block_access_nil
+  test "block_access breaks when no rules are defined" do
     @access_allowed_for = nil
     assert_raises(ArgumentError) { block_access }
   end
   
-  def test_block_access_on_object_with_role_and_accessors_defined
-    @access_allowed_for = {:special => [{
-        :directives => {}
-      }]}
-    @authenticated = Resource.new :role => 'user', :'special?' => true
-    @params = HashWithIndifferentAccess.new :action => :new
+  test "access is denied when there are no rules" do
+    @access_allowed_for = {}
     assert !block_access
   end
   
-  def test_block_access_on_object_with_multiple_block_accessors_defined
-    @access_allowed_for = {:special => [{
-        :directives => {}
-      }]}
-    @authenticated = Resource.new :'special?' => true, :'admin?' => true
-    @params = HashWithIndifferentAccess.new :action => :new
+  test "access is granted when authenticated has role and accessor and a rule matches accessor" do
+    @authenticated = Resource.new(:role => 'user', :'special?' => true)
+    set_rules(:special => [{:directives => {}}])
+    set_params(:action => :new)
+    assert block_access
+  end
+  
+  test "access is granted when authenticated has role and accessor and a rule matches role" do
+    @authenticated = Resource.new(:role => 'user', :'special?' => true)
+    set_rules(:user => [{:directives => {}}])
+    set_params(:action => :new)
+    assert block_access
+  end
+  
+  test "access is denied when authenticated has role and accessor and NO rule matches" do
+    @authenticated = Resource.new(:role => 'user', :'special?' => true)
+    set_rules(:admin => [{:directives => {}}])
+    set_params(:action => :new)
     assert !block_access
   end
   
-  def test_block_access_on_object_with_accessor_dined_on_role
-    @access_allowed_for = {:user => [{
+  test "access is granted when authenticated has multiple accessors and a rule matches" do
+    @access_allowed_for = {:special => [{
         :directives => {}
       }]}
-    @authenticated = Resource.new :role => 'user', :'special?' => true
-    @params = HashWithIndifferentAccess.new :action => :new
-    assert !block_access
+    @authenticated = Resource.new(:'special?' => true, :'admin?' => true)
+    @params = { :action => :new }.with_indifferent_access
+    assert block_access
   end
   
   private
   
+  def set_rules(rules)
+    @access_allowed_for = rules.with_indifferent_access
+  end
+  
+  def set_params(params)
+    @params = params.with_indifferent_access
+  end
+  
   def assert_action_allowed(h)
-    h.each do |pair, value|
-      params = HashWithIndifferentAccess.new(:action => pair.last)
-      assert_equal value, action_allowed?(params, pair.first), "For #{pair.inspect} => #{value.inspect}"
+    h.each do |(role, action), value|
+      params = {:action => action}.with_indifferent_access
+      assert_equal(value, action_allowed?(params, role), "Expected #{role} to access #{action} with params #{params.inspect}")
     end
   end
   
   def assert_resource_allowed(h)
-    h.each do |triplet, value|
-      params = HashWithIndifferentAccess.new(triplet.first)
-      assert_equal value, resource_allowed?(params, triplet[1], triplet.last ? Resource.new(triplet.last) : nil), "For #{triplet.inspect} => #{value.inspect}"
+    h.each do |(params, role, authenticated), value|
+      params        = params.with_indifferent_access
+      authenticated = authenticated ? Resource.new(authenticated) : nil
+      assert_equal(value, resource_allowed?(params, role, authenticated), "Expected #{role} #{authenticated} to access #{params.inspect}")
     end
   end
   

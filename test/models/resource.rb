@@ -14,6 +14,10 @@ class Resource
     @attributes['id'] = value
   end
   
+  def to_s
+    "#<Resource:#{object_id} #{@attributes.inspect}>"
+  end
+  
   def method_missing(m, v=nil)
     if m.to_s =~ /(.*)=$/
       @attributes[$1] = v

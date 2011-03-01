@@ -3,25 +3,30 @@ module Authorization
     protected
 
     # Block access to all actions in the controller, designed to be used as a <tt>before_filter</tt>.
+    #
     #   class ApplicationController < ActionController::Base
     #     before_filter :block_access
     #   end
+    #
+    # When there are no rules to allow the client on the requested resource it calls
+    # +access_forbidden+. You can override +access_forbidden+ to halt the filter
+    # chain or do something else.
+    #
+    # The +block_access+ method returns +true+ when access was granted. It returns
+    # the same thing as +access_forbidden+ when access was forbidden.
     def block_access
       die_if_undefined
       unless @authenticated.nil?
-        # Find the user's roles
-        roles = []
-        roles << @authenticated.role if @authenticated.respond_to?(:role)
-        access_allowed_for.keys.each do |role|
-           roles << role.to_s if @authenticated.respond_to?("#{role}?") and @authenticated.send("#{role}?")
+        if @authenticated.respond_to?(:role)
+          return true if access_allowed?(params, @authenticated.role, @authenticated)
         end
-        # Check if any of the roles give her access
-        roles.each do |role|
-          return true if access_allowed?(params, role, @authenticated)
+        access_allowed_for.keys.each do |role|
+          if @authenticated.respond_to?("#{role}?") and @authenticated.send("#{role}?")
+            return true if access_allowed?(params, role, @authenticated)
+          end
         end
       end
-      return true if access_allowed?(params, :all, @authenticated)
-      access_forbidden
+      access_allowed?(params, :all, @authenticated) ? true : access_forbidden
     end
 
     # Checks if access is allowed for the params, role and authenticated user.
