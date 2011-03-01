@@ -2,6 +2,12 @@ module Authorization
   module BlockAccess
     protected
 
+    def die_if_undefined #:nodoc:
+      if !self.respond_to?(:access_allowed_for) or access_allowed_for.nil?
+        raise ArgumentError, "Please specify access control using `allow_access' in the controller"
+      end
+    end
+
     # Block access to all actions in the controller, designed to be used as a <tt>before_filter</tt>.
     #
     #   class ApplicationController < ActionController::Base
@@ -18,34 +24,61 @@ module Authorization
       die_if_undefined
       unless @authenticated.nil?
         if @authenticated.respond_to?(:role)
-          return true if access_allowed?(params, @authenticated.role, @authenticated)
+          return true if _access_allowed?(params, @authenticated.role, @authenticated)
         end
         access_allowed_for.keys.each do |role|
           if @authenticated.respond_to?("#{role}?") and @authenticated.send("#{role}?")
-            return true if access_allowed?(params, role, @authenticated)
+            return true if _access_allowed?(params, role, @authenticated)
           end
         end
       end
-      access_allowed?(params, :all, @authenticated) ? true : access_forbidden
+      _access_allowed?(params, :all, @authenticated) ? true : access_forbidden
     end
 
-    # Checks if access is allowed for the params, role and authenticated user.
-    #   access_allowed?({:action => :show, :id => 1}, :admin, @authenticated)
-    def access_allowed?(params, role, authenticated=nil)
-      die_if_undefined
-      if (rules = access_allowed_for[role]).nil?
-        logger.debug("  \e[31mCan't find rules for `#{role}'\e[0m")
-        return false
+    # TODO: START
+
+    def _access_allowed_to_action_with_rule?(rule, params)
+      action     = params[:action]
+      directives = rule[:directives]
+      if directives[:only]
+        directives[:only] == action or (directives[:only].respond_to?(:include?) and directives[:only].include?(action))
+      elsif directives[:except]
+        directives[:except] != action and !(directives[:except].respond_to?(:include?) and directives[:except].include?(action))
+      else
+        true
       end
-      !rules.detect do |rule|
-        if !action_allowed_by_rule?(rule, params, role) or !resource_allowed_by_rule?(rule, params, role, authenticated) or !block_allowed_by_rule?(rule)
-          logger.debug("  \e[31mAccess DENIED by RULE #{rule.inspect} FOR `#{role}'\e[0m")
-          false
-        else
-          logger.debug("  \e[32mAccess GRANTED by RULE #{rule.inspect} FOR `#{role}'\e[0m")
-          true
+    end
+
+    def _access_allowed_by_block_with_rule?(rule)
+      block = rule[:block] ? rule[:block].bind(self).call : true
+    end
+
+    def _access_allowed_with_rule?(rule, params, role, authenticated)
+      _access_allowed_to_action_with_rule?(rule, params) and
+        _access_allowed_by_block_with_rule?(rule)
+    end
+
+    def _access_allowed?(params, role, authenticated=nil)
+      die_if_undefined
+      # puts '---'
+      # puts "Params: #{params.inspect}"
+      # puts "Role: #{role}"
+      # puts "Authenticated: #{authenticated}"
+      if rules = access_allowed_for[role]
+        rules.each do |rule|
+          # puts "Rule: #{rule.inspect}"
+          if _access_allowed_with_rule?(rule, params, role, authenticated)
+            logger.debug("  \e[32mAccess GRANTED by RULE #{rule.inspect} FOR `#{role}'\e[0m")
+            return true
+          else
+            logger.debug("  \e[31mAccess DENIED by RULE #{rule.inspect} FOR `#{role}'\e[0m")
+          end
         end
-      end.nil?
+        false
+      else
+        logger.debug("  \e[31mCan't find rules for `#{role}'\e[0m")
+        false
+      end
     end
 
     # <tt>access_forbidden</tt> is called by <tt>block_access</tt> when access is forbidden. This method does
@@ -54,6 +87,8 @@ module Authorization
     def access_forbidden
       false
     end
+
+    # TODO: END
 
     # Checks if a certain action can be accessed by the role.
     # If you want to check for <tt>action_allowed?</tt>, <tt>resource_allowed?</tt> and <tt>block_allowed?</tt>
@@ -127,12 +162,6 @@ module Authorization
     def block_allowed_by_rule?(rule) #:nodoc:
       return false if !rule[:block].nil? and !rule[:block].bind(self).call
       true
-    end
-
-    def die_if_undefined #:nodoc:
-      if !self.respond_to?(:access_allowed_for) or access_allowed_for.nil?
-        raise ArgumentError, "Please specify access control using `allow_access' in the controller"
-      end
     end
   end
 end
