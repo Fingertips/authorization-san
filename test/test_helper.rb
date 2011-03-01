@@ -1,14 +1,11 @@
 module AuthorizationSanTest
   module Initializer
     VENDOR_RAILS = File.expand_path('../../../../rails', __FILE__)
-    OTHER_RAILS = File.expand_path('../../../rails', __FILE__)
     PLUGIN_ROOT = File.expand_path('../../', __FILE__)
     
     def self.rails_directory
       if File.exist?(VENDOR_RAILS)
         VENDOR_RAILS
-      elsif File.exist?(OTHER_RAILS)
-        OTHER_RAILS
       end
     end
     
