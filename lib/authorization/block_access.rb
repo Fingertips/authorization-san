@@ -24,9 +24,10 @@ module Authorization
       die_if_undefined
       unless @authenticated.nil?
         if @authenticated.respond_to?(:role)
+          checked = @authenticated.role.to_s
           return true if _access_allowed?(params, @authenticated.role, @authenticated)
         end
-        access_allowed_for.keys.each do |role|
+        (access_allowed_for.keys-[checked]).each do |role|
           if @authenticated.respond_to?("#{role}?") and @authenticated.send("#{role}?")
             return true if _access_allowed?(params, role, @authenticated)
           end
@@ -84,14 +85,14 @@ module Authorization
       if rules = access_allowed_for[role]
         rules.each do |rule|
           if _access_allowed_with_rule?(rule, params, role, authenticated)
-            logger.debug("  \e[32mAccess GRANTED by RULE #{rule.inspect} FOR `#{role}'\e[0m")
+            logger.debug("  \e[32mAccess granted by rule #{rule.inspect} for #{role}\e[0m")
             return true
           else
-            logger.debug("  \e[31mAccess DENIED by RULE #{rule.inspect} FOR `#{role}'\e[0m")
+            logger.debug("  \e[31mAccess denied by rule #{rule.inspect} for #{role}\e[0m")
           end
         end
       else
-        logger.debug("  \e[31mCan't find rules for `#{role}'\e[0m")
+        logger.debug("  \e[31mCan't find rules for #{role}\e[0m")
       end
       false
     end
