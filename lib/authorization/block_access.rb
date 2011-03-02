@@ -37,7 +37,7 @@ module Authorization
 
     def _matches_action?(directives, action) #:nodoc:
       if directives[:only]
-        directives[:only] == action or (directives[:only].respond_to?(:include?) and directives[:only].include?(action));
+        directives[:only] == action or (directives[:only].respond_to?(:include?) and directives[:only].include?(action))
       elsif directives[:except]
         directives[:except] != action and !(directives[:except].respond_to?(:include?) and directives[:except].include?(action))
       else
