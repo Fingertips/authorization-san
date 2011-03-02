@@ -3,10 +3,23 @@ require 'rake/rdoctask'
 
 task :default => :test
 
-Rake::TestTask.new do |t|
-  t.test_files = FileList['test/**/*_test.rb']
-  t.verbose = true
+namespace :test do
+  Rake::TestTask.new(:rails2) do |t|
+    t.libs += %w(test test/test_helper/rails2)
+    t.pattern = 'test/**/*_test.rb'
+    t.verbose = true
+  end
+  
+  desc 'Test the plugin with Rails 3.'
+  Rake::TestTask.new(:rails3) do |t|
+    t.libs += %w(test test/test_helper/rails3)
+    t.pattern = 'test/**/*_test.rb'
+    t.verbose = true
+  end
 end
+
+desc 'Run all tests'
+task :test => ['test:rails2', 'test:rails3']
 
 namespace :docs do
   Rake::RDocTask.new('generate') do |rdoc|
