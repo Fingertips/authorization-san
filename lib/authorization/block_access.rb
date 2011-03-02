@@ -35,38 +35,54 @@ module Authorization
       _access_allowed?(params, :all, @authenticated) ? true : access_forbidden
     end
 
-    # TODO: START
-
-    def _access_allowed_to_action_with_rule?(rule, params)
-      action     = params[:action]
-      directives = rule[:directives]
+    def _matches_action?(directives, action) #:nodoc:
       if directives[:only]
-        directives[:only] == action or (directives[:only].respond_to?(:include?) and directives[:only].include?(action))
+        directives[:only] == action or (directives[:only].respond_to?(:include?) and directives[:only].include?(action));
       elsif directives[:except]
         directives[:except] != action and !(directives[:except].respond_to?(:include?) and directives[:except].include?(action))
       else
         true
       end
     end
-
-    def _access_allowed_by_block_with_rule?(rule)
-      block = rule[:block] ? rule[:block].bind(self).call : true
+    
+    def _matches_scope?(scope, params, authenticated) #:nodoc:
+      return true if scope.nil?
+      scope_id  = params["#{scope}_id"].to_i
+      object_id = authenticated.send(scope).id.to_i
+      (object_id > 0) and (scope_id == object_id)
+    rescue NoMethodError
+      false
+    end
+    
+    def _matches_user_resource?(run, params, authenticated) #:nodoc:
+      return true unless run
+      authenticated_id = authenticated ? authenticated.id.to_i : 0
+      (authenticated_id > 0) and (params[:id].to_i == authenticated_id)
+    end
+    
+    def _matches_authenticated_requirement?(run, authenticated) #:nodoc:
+      return true unless run
+      authenticated
     end
 
-    def _access_allowed_with_rule?(rule, params, role, authenticated)
-      _access_allowed_to_action_with_rule?(rule, params) and
-        _access_allowed_by_block_with_rule?(rule)
+    def _block_is_successful?(block) #:nodoc:
+      block ? block.bind(self).call : true
     end
 
-    def _access_allowed?(params, role, authenticated=nil)
+    def _access_allowed_with_rule?(rule, params, role, authenticated) #:nodoc:
+      action     = params[:action].to_sym
+      directives = rule[:directives]
+      _matches_action?(directives, action) and
+        _matches_scope?(directives[:scope], params, authenticated) and
+        _matches_user_resource?(directives[:user_resource], params, authenticated) and
+        _matches_authenticated_requirement?(directives[:authenticated], authenticated) and
+        _block_is_successful?(rule[:block])
+    end
+
+    def _access_allowed?(params, role, authenticated=nil) #:nodoc:
       die_if_undefined
-      # puts '---'
-      # puts "Params: #{params.inspect}"
-      # puts "Role: #{role}"
-      # puts "Authenticated: #{authenticated}"
       if rules = access_allowed_for[role]
         rules.each do |rule|
-          # puts "Rule: #{rule.inspect}"
           if _access_allowed_with_rule?(rule, params, role, authenticated)
             logger.debug("  \e[32mAccess GRANTED by RULE #{rule.inspect} FOR `#{role}'\e[0m")
             return true
@@ -74,11 +90,10 @@ module Authorization
             logger.debug("  \e[31mAccess DENIED by RULE #{rule.inspect} FOR `#{role}'\e[0m")
           end
         end
-        false
       else
         logger.debug("  \e[31mCan't find rules for `#{role}'\e[0m")
-        false
       end
+      false
     end
 
     # <tt>access_forbidden</tt> is called by <tt>block_access</tt> when access is forbidden. This method does
@@ -87,8 +102,6 @@ module Authorization
     def access_forbidden
       false
     end
-
-    # TODO: END
 
     # Checks if a certain action can be accessed by the role.
     # If you want to check for <tt>action_allowed?</tt>, <tt>resource_allowed?</tt> and <tt>block_allowed?</tt>

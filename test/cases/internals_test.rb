@@ -147,24 +147,130 @@ class AccessByRuleTest < ActiveSupport::TestCase
   include Authorization::BlockAccess
   include MethodsHelpers
   
-  test "access is granted when there are no restrictions on actions" do
-    assert _access_allowed_to_action_with_rule?({:directives => {}}, {:action => 'new'})
+  test "matches action when there are no restrictions on action" do
+    assert _matches_action?({}, :new)
   end
   
-  test "access is granted when there are no restrictions on actions and there is no action" do
-    assert _access_allowed_to_action_with_rule?({:directives => {}}, {})
+  test "matches action when there are no restrictions on action and no action" do
+    assert _matches_action?({}, nil)
   end
   
-  test "access is granted when an action matches and is included in the directives (array)" do
-    assert _access_allowed_to_action_with_rule?({:directives => {
-      :only => [:index, :new, :create]
-    }}, {:action => :index})
+  test "matches action when there are inclusive restrictions on action (array)" do
+    assert _matches_action?({:only => [:index, :new, :create]}, :index)
   end
   
-  test "access is granted when an action matches and is included in the directives (symbol)" do
-    assert _access_allowed_to_action_with_rule?({:directives => {
-      :only => :index
-    }}, {:action => :index})
+  test "matches action when there are inclusive restrictions on action (symbol)" do
+    assert _matches_action?({:only => :index}, :index)
+  end
+  
+  test "matches action when there are exclusive restrictions on action (array)" do
+    assert _matches_action?({:except => [:update, :create, :delete]}, :index)
+  end
+  
+  test "matches action when there are exclusive restrictions on action (symbol)" do
+    assert _matches_action?({:except => :update}, :index)
+  end
+  
+  test "does not match action when there are inclusive restrictions on action (array)" do
+    assert !_matches_action?({:only => [:index, :new, :create]}, :update)
+  end
+  
+  test "does not match action when there are inclusive restrictions on action (symbol)" do
+    assert !_matches_action?({:only => :index}, :update)
+  end
+  
+  test "does not match action when there are exclusive restrictions on action (array)" do
+    assert !_matches_action?({:except => [:update, :create, :delete]}, :update)
+  end
+  
+  test "does not match action when there are exclusive restrictions on action (symbol)" do
+    assert !_matches_action?({:except => :update}, :update)
+  end
+  
+  test "accepts a block when it's not there" do
+    assert _block_is_successful?(nil)
+  end
+  
+  test "accepts a block when it returns true" do
+    assert _block_is_successful?(lambda { true })
+  end
+  
+  test "refuses a block when it returns false" do
+    assert !_block_is_successful?(lambda { false })
+  end
+  
+  test "matches scope when there is no scope" do
+    assert _matches_scope?(nil, {}, nil)
+  end
+  
+  test "matches scope when the object ID matches the ID in the params" do
+    assert _matches_scope?(:organization,
+      {:organization_id => 12}.with_indifferent_access,
+      Resource.new(:organization => Resource.new(:id => 12)))
+  end
+  
+  test "does not match scope when the ID in the params is blank" do
+    assert !_matches_scope?(:organization,
+      {}.with_indifferent_access,
+      Resource.new(:organization => Resource.new(:id => 12)))
+  end
+  
+  test "does not match scope when the object ID is nil" do
+    assert !_matches_scope?(:organization,
+      {:organization_id => 12}.with_indifferent_access,
+      Resource.new(:organization => Resource.new(:id => nil)))
+  end
+  
+  test "does not match scope when both params are blank and the object ID is nil" do
+    assert !_matches_scope?(:organization,
+      {}.with_indifferent_access,
+      Resource.new(:organization => Resource.new(:id => nil)))
+  end
+  
+  test "does not match scope when the object ID does not match the ID in the params" do
+    assert !_matches_scope?(:organization,
+      {:organization_id => 32 }.with_indifferent_access,
+      Resource.new(:organization => Resource.new(:id => 65)))
+  end
+  
+  test "matches user resource when it doesn't have to run" do
+    assert _matches_user_resource?(false, {}, nil)
+  end
+  
+  test "matches user resource when it matches the params" do
+    assert _matches_user_resource?(true, {:id => 12}.with_indifferent_access, Resource.new(:id => 12))
+  end
+  
+  test "does not match user resource when the params are empty" do
+    assert !_matches_user_resource?(true, {}.with_indifferent_access, Resource.new(:id => 12))
+  end
+  
+  test "does not match user resource when the params are wrong" do
+    assert !_matches_user_resource?(true, {:id => 32}.with_indifferent_access, Resource.new(:id => 12))
+  end
+  
+  test "does not match user resource when the resource has no ID" do
+    assert !_matches_user_resource?(true, {:id => 12}.with_indifferent_access, Resource.new(:id => nil))
+  end
+  
+  test "matches authenticated requirement when it doesn't have to run (boolean)" do
+    assert _matches_authenticated_requirement?(false, nil)
+  end
+  
+  test "matches authenticated requirement when it doesn't have to run (nil)" do
+    assert _matches_authenticated_requirement?(nil, nil)
+  end
+  
+  test "matches authenticated requirement when authenticated is thruthy" do
+    assert _matches_authenticated_requirement?(true, Resource.new)
+  end
+  
+  test "does not match authenticated requirement when authenticated is not thruthy (boolean)" do
+    assert !_matches_authenticated_requirement?(true, false)
+  end
+  
+  test "does not match authenticated requirement when authenticated is not thruthy (nil)" do
+    assert !_matches_authenticated_requirement?(true, nil)
   end
 end
 
