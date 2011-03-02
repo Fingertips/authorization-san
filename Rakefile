@@ -40,7 +40,7 @@ begin
     s.homepage = "http://fingertips.github.com"
     
     s.authors = ["Manfred Stienstra"]
-    s.files = %w(lib/authorization.rb lib/authorization/allow_access.rb lib/authorization/block_access.rb rails/init.rb README.rdoc LICENSE)
+    s.files = %w(lib/authorization.rb lib/authorization/allow_access.rb lib/authorization/block_access.rb lib/authorization/deprecated.rb rails/init.rb README.rdoc LICENSE)
   end
 rescue LoadError
 end
