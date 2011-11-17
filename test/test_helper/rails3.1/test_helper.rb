@@ -4,7 +4,7 @@ module AuthorizationSanTest
   module Initializer
     def self.load_dependencies
       require 'rubygems'
-      gem 'rails', '< 3.1'
+      gem 'rails', '< 3.2'
       
       require 'test/unit'
       
@@ -18,7 +18,7 @@ module AuthorizationSanTest
       $:.unshift File.expand_path('../../lib', __FILE__)
       require File.join(PLUGIN_ROOT, 'rails', 'init')
       
-      puts "{!} Running on Rails 3"
+      puts "{!} Running on Rails 3.1"
     end
   end
 end

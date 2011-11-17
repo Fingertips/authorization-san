@@ -3,13 +3,8 @@ require File.expand_path('../../shared', __FILE__)
 module AuthorizationSanTest
   module Initializer
     def self.load_dependencies
-      if rails_directory
-        $:.unshift(File.join(rails_directory, 'activesupport', 'lib'))
-        $:.unshift(File.join(rails_directory, 'activerecord', 'lib'))
-      else
-        require 'rubygems'
-        gem 'rails', '< 3.0'
-      end
+      require 'rubygems'
+      gem 'rails', '< 3.0'
       
       require 'test/unit'
       
@@ -22,6 +17,8 @@ module AuthorizationSanTest
       
       $:.unshift File.expand_path('../../lib', __FILE__)
       require File.join(PLUGIN_ROOT, 'rails', 'init')
+      
+      puts "{!} Running on Rails 2"
     end
   end
 end

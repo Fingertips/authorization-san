@@ -2,10 +2,20 @@ require 'test_helper'
 
 require 'models/resource'
 require 'helpers/methods'
+require 'helpers/collector'
 
 class DeprecatedTest < ActiveSupport::TestCase
   include Authorization::BlockAccess
   include MethodsHelpers
+  
+  def setup
+    @stderr = $stderr
+    $stderr = Collector.new
+  end
+  
+  def teardown
+    $stderr = @stderr
+  end
   
   test "action_allowed? sanity" do
     @access_allowed_for = {

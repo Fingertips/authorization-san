@@ -48,7 +48,11 @@ module Authorization
     #   end
     def allow_access(*args, &block)
       unless self.respond_to?(:access_allowed_for)
-        self.class_inheritable_accessor(:access_allowed_for)
+        if respond_to?(:class_attribute)
+          class_attribute :access_allowed_for
+        else
+          class_inheritable_accessor(:access_allowed_for)
+        end
         self.access_allowed_for = {}.with_indifferent_access
         send(:protected, :access_allowed_for, :access_allowed_for=)
       end

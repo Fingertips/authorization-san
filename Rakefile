@@ -16,10 +16,17 @@ namespace :test do
     t.pattern = 'test/**/*_test.rb'
     t.verbose = true
   end
+  
+  desc 'Test the plugin with Rails 3.1.'
+  Rake::TestTask.new(:rails31) do |t|
+    t.libs += %w(test test/test_helper/rails3.1)
+    t.pattern = 'test/**/*_test.rb'
+    t.verbose = true
+  end
 end
 
 desc 'Run all tests'
-task :test => ['test:rails2', 'test:rails3']
+task :test => ['test:rails2', 'test:rails3', 'test:rails31']
 
 namespace :docs do
   Rake::RDocTask.new('generate') do |rdoc|
