@@ -38,6 +38,7 @@ namespace :docs do
 end
 
 begin
+  require 'rubygems'
   require 'jeweler'
   Jeweler::Tasks.new do |s|
     s.name = "authorization-san"
