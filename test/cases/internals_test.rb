@@ -55,6 +55,13 @@ class BlockAccessTest < ActiveSupport::TestCase
     assert_raises(ArgumentError) { block_access }
   end
   
+  test "access is denied when there is no action in the params and a role matches" do
+    @authenticated = Resource.new(:role => 'user', :'special?' => true)
+    @access_allowed_for = { :special => [{:directives=>{}}] }
+    @params = {}.with_indifferent_access
+    assert_equal(false, block_access)
+  end
+  
   test "access is denied when there are no rules" do
     @access_allowed_for = {}
     assert !block_access

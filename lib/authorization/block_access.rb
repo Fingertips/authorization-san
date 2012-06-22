@@ -71,7 +71,8 @@ module Authorization
     end
 
     def _access_allowed_with_rule?(rule, params, role, authenticated) #:nodoc:
-      action     = params[:action].to_sym
+      return false if params[:action].nil?
+      action = params[:action].to_sym
       directives = rule[:directives]
       _matches_action?(directives, action) and
         _matches_scope?(directives[:scope], params, authenticated) and
