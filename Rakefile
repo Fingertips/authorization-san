@@ -4,30 +4,32 @@ require 'rake/rdoctask'
 task :default => :test
 
 namespace :test do
+  test_files = Dir.glob("test/**/*_test.rb")
+  
   Rake::TestTask.new(:rails2) do |t|
     t.libs += %w(test test/test_helper/rails2)
-    t.pattern = 'test/**/*_test.rb'
+    t.test_files = test_files
     t.verbose = true
   end
   
   desc 'Test the plugin with Rails 3.'
   Rake::TestTask.new(:rails3) do |t|
     t.libs += %w(test test/test_helper/rails3)
-    t.pattern = 'test/**/*_test.rb'
+    t.test_files = test_files
     t.verbose = true
   end
   
   desc 'Test the plugin with Rails 3.1.'
   Rake::TestTask.new(:rails31) do |t|
     t.libs += %w(test test/test_helper/rails3.1)
-    t.pattern = 'test/**/*_test.rb'
+    t.test_files = test_files
     t.verbose = true
   end
 
   desc 'Test the plugin with Rails 3.2.'
   Rake::TestTask.new(:rails32) do |t|
     t.libs += %w(test test/test_helper/rails3.2)
-    t.pattern = 'test/**/*_test.rb'
+    t.test_files = test_files
     t.verbose = true
   end
 end
