@@ -23,10 +23,17 @@ namespace :test do
     t.pattern = 'test/**/*_test.rb'
     t.verbose = true
   end
+
+  desc 'Test the plugin with Rails 3.2.'
+  Rake::TestTask.new(:rails32) do |t|
+    t.libs += %w(test test/test_helper/rails3.2)
+    t.pattern = 'test/**/*_test.rb'
+    t.verbose = true
+  end
 end
 
 desc 'Run all tests'
-task :test => ['test:rails2', 'test:rails3', 'test:rails31']
+task :test => ['test:rails2', 'test:rails3', 'test:rails31', 'test:rails32']
 
 namespace :docs do
   Rake::RDocTask.new('generate') do |rdoc|
@@ -35,6 +42,16 @@ namespace :docs do
     rdoc.rdoc_files.include('README.rdoc', 'lib/authorization')
     rdoc.options << "--all" << "--charset" << "utf-8"
   end
+end
+
+namespace :travis do
+  # Install all Gem dependencies
+  task :install do
+    sh "./install.sh"
+  end
+
+  # Install dependencies and run all tests
+  task :run => %w(travis:install test)
 end
 
 begin
