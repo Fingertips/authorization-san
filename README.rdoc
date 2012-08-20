@@ -19,3 +19,11 @@ Authorization-san allows you to specify access policies in your controllers. The
   end
 
 The best place to start learning more is the <tt>examples</tt> directory in the source.
+
+== Contributers
+
+In order of appearance:
+
+* Manfred Stienstra <manfred@fngtps.com>
+* Eloy Duran <eloy@fngtps.com>
+* Hrvoje Šimić <shime.ferovac@gmail.com>
