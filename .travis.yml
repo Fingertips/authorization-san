@@ -3,4 +3,4 @@ rvm:
   - ree
   - 1.8.7
   - 1.9.3-p194
-script: bundle exec rake travis:run
+script: rake travis:run
