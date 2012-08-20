@@ -4,7 +4,7 @@ module AuthorizationSanTest
   module Initializer
     def self.load_dependencies
       require 'rubygems'
-      gem 'rails', '< 3.1'
+      gem 'rails', '~> 3.0.0'
       
       require 'test/unit'
       

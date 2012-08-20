@@ -4,7 +4,7 @@ module AuthorizationSanTest
   module Initializer
     def self.load_dependencies
       require 'rubygems'
-      gem 'rails', '< 3.0'
+      gem 'rails', '~> 2.3.0'
       
       require 'test/unit'
       
@@ -19,6 +19,18 @@ module AuthorizationSanTest
       require File.join(PLUGIN_ROOT, 'rails', 'init')
       
       puts "{!} Running on Rails 2"
+    end
+  end
+end
+
+unless RUBY_VERSION < '1.9'
+  module ActiveSupport
+    module Dependencies
+      def load_without_new_constant_marking(*args,&blk)
+        super(*args,&blk)
+      rescue LoadError
+        nil
+      end
     end
   end
 end
