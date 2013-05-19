@@ -7,7 +7,7 @@ module Authorization
     #   action_allowed?({:action => :show, :id => 1}, :editor)
     def action_allowed?(params, role=:all)
       ::ActiveSupport::Deprecation.warn("action_allowed? has been deprecated.", caller)
-      die_if_undefined
+      _die_if_undefined
       return false if (rules = access_allowed_for[role]).nil?
       !rules.detect { |rule| action_allowed_by_rule?(rule, params, role) }.nil?
     end
@@ -30,7 +30,7 @@ module Authorization
     def resource_allowed?(params, role=:all, user=nil)
       ::ActiveSupport::Deprecation.warn("resource_allowed? has been deprecated.", caller)
       user ||= @authenticated
-      die_if_undefined
+      _die_if_undefined
       return false if (rules = access_allowed_for[role]).nil?
       !rules.detect { |rule| resource_allowed_by_rule?(rule, params, role, user) }.nil?
     end
@@ -70,7 +70,7 @@ module Authorization
     #   block_allowed?(:guest)
     def block_allowed?(role)
       ::ActiveSupport::Deprecation.warn("block_allowed? has been deprecated.", caller)
-      die_if_undefined
+      _die_if_undefined
       return false if (rules = access_allowed_for[role]).nil?
       !rules.detect { |rule| block_allowed_by_rule?(rule) }.nil?
     end

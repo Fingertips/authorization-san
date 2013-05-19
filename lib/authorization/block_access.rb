@@ -2,10 +2,14 @@ module Authorization
   module BlockAccess
     protected
 
-    def die_if_undefined #:nodoc:
-      if !self.respond_to?(:access_allowed_for) or access_allowed_for.nil?
-        raise ArgumentError, "Please specify access control using `allow_access' in the controller"
-      end
+    def _raise_undefined_error
+      raise ArgumentError, "Please specify access control using `allow_access' in the controller"
+    end
+
+    def _die_if_undefined #:nodoc:
+      _raise_undefined_error if access_allowed_for.nil?
+    rescue NoMethodError
+      _raise_undefined_error
     end
 
     # Block access to all actions in the controller, designed to be used as a <tt>before_filter</tt>.
@@ -21,7 +25,7 @@ module Authorization
     # The +block_access+ method returns +true+ when access was granted. It returns
     # the same thing as +access_forbidden+ when access was forbidden.
     def block_access
-      die_if_undefined
+      _die_if_undefined
       unless @authenticated.nil?
         if @authenticated.respond_to?(:role)
           checked = @authenticated.role.to_s
@@ -82,7 +86,7 @@ module Authorization
     end
 
     def _access_allowed?(params, role, authenticated=nil) #:nodoc:
-      die_if_undefined
+      _die_if_undefined
       if rules = access_allowed_for[role]
         rules.each do |rule|
           if _access_allowed_with_rule?(rule, params, role, authenticated)
