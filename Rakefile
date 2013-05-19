@@ -59,27 +59,3 @@ namespace :travis do
   # Install dependencies and run all tests
   task :run => %w(travis:install test)
 end
-
-begin
-  require 'rubygems'
-  require 'jeweler'
-  Jeweler::Tasks.new do |s|
-    s.name = "authorization-san"
-    s.description = "A plugin for authorization in a ReSTful application."
-    s.summary = "A plugin for authorization in a ReSTful application."
-    s.email = "manfred@fngtps.com"
-    s.homepage = "http://fingertips.github.com"
-    
-    s.authors = ["Manfred Stienstra"]
-    s.files = %w(lib/authorization.rb lib/authorization/allow_access.rb lib/authorization/block_access.rb lib/authorization/deprecated.rb rails/init.rb README.rdoc LICENSE)
-  end
-rescue LoadError
-end
-
-begin
-  require 'jewelry_portfolio/tasks'
-  JewelryPortfolio::Tasks.new do |p|
-    p.account = 'Fingertips'
-  end
-rescue LoadError
-end
