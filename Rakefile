@@ -1,5 +1,14 @@
 require 'rake/testtask'
-require 'rake/rdoctask'
+
+begin
+  require 'rdoc/task'
+rescue LoadError
+end
+
+begin
+  require 'rake/rdoctask'
+rescue
+end
 
 task :default => :test
 
