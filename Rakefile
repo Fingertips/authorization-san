@@ -35,7 +35,11 @@ namespace :test do
 end
 
 desc 'Run all tests'
-task :test => ['test:rails2', 'test:rails3', 'test:rails31', 'test:rails32']
+if RUBY_VERSION < '2.0.0'
+  task :test => ['test:rails2', 'test:rails3', 'test:rails31', 'test:rails32']
+else
+  task :test => ['test:rails32']
+end
 
 namespace :docs do
   Rake::RDocTask.new('generate') do |rdoc|
