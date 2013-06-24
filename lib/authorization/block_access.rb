@@ -7,7 +7,7 @@ module Authorization
     end
 
     def _die_if_undefined #:nodoc:
-      _raise_undefined_error if access_allowed_for.nil?
+      _raise_undefined_error if defined?(access_allowed_for).nil? || access_allowed_for.nil?
     rescue NoMethodError
       _raise_undefined_error
     end
