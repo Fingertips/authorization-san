@@ -27,3 +27,4 @@ In order of appearance:
 * Manfred Stienstra <manfred@fngtps.com>
 * Eloy Duran <eloy@fngtps.com>
 * Hrvoje Šimić <shime.ferovac@gmail.com>
+* Jeff Kreeftmeijer <jeff@fngtps.com>
