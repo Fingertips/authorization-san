@@ -71,7 +71,14 @@ module Authorization
     end
 
     def _block_is_successful?(block) #:nodoc:
-      block ? block.bind(self).call : true
+      return true unless block
+
+      if respond_to?(:instance_exec)
+        self.instance_exec(&block)
+      else
+        # deprecated in Rails 4.x
+        block.bind(self).call
+      end
     end
 
     def _access_allowed_with_rule?(rule, params, role, authenticated) #:nodoc:
