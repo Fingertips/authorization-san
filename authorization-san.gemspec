@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = "authorization-san"
-  s.version = "2.2.0"
+  s.version = "2.3.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Manfred Stienstra"]
-  s.date = "2012-06-22"
+  s.date = "2014-03-21"
   s.description = "A plugin for authorization in a ReSTful application."
   s.email = "manfred@fngtps.com"
   s.extra_rdoc_files = [
