@@ -166,11 +166,15 @@ class BehaviourTest < ActionController::TestCase
   def tests(controller, options={})
     @request = ActionController::TestRequest.new
     @response = ActionController::TestResponse.new
-    @controller ||= controller.new rescue nil
+    @controller ||= controller.new
     
-    if defined?(ActionDispatch)
+    if defined?(Rails) && Rails.respond_to?(:application)
+      Rails.application.routes.draw do
+        get ':controller(/:action(/:id(.:format)))'
+      end
+    elsif defined?(ActionDispatch)
       @routes = ActionDispatch::Routing::RouteSet.new
-      @routes.draw { match ':controller(/:action(/:id(.:format)))' }
+      @routes.draw { get ':controller(/:action(/:id(.:format)))' }
       @routes.finalize!
       controller._routes = @routes
     end

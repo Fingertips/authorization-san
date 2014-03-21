@@ -17,11 +17,11 @@ class BlockAccessTest < ActiveSupport::TestCase
         }],
       :blocked_guest => [{
           :directives => {:only => :index},
-          :block => self.class.instance_method(:do_false)
+          :block => do_false
         }],
       :open_guest => [{
           :directives => {:only => :index},
-          :block => self.class.instance_method(:do_true)
+          :block => do_true
         }],
       :complex => [
           {:directives => {:only => :index}},
@@ -147,11 +147,11 @@ class AccessByRuleTest < ActiveSupport::TestCase
   end
   
   test "accepts a block when it returns true" do
-    assert _block_is_successful?(lambda { true })
+    assert _block_is_successful?(create_unbound_method { true })
   end
   
   test "refuses a block when it returns false" do
-    assert !_block_is_successful?(lambda { false })
+    assert !_block_is_successful?(create_unbound_method { false })
   end
   
   test "matches scope when there is no scope" do
@@ -226,5 +226,11 @@ class AccessByRuleTest < ActiveSupport::TestCase
   
   test "does not match authenticated requirement when authenticated is not thruthy (nil)" do
     assert !_matches_authenticated_requirement?(true, nil)
+  end
+
+  private
+
+  def create_unbound_method(&block)
+    block
   end
 end

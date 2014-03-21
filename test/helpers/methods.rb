@@ -6,11 +6,11 @@ module MethodsHelpers
   end
   
   def do_false
-    false
+    Proc.new { false }
   end
   
   def do_true
-    true
+    Proc.new { true }
   end
   
   def set_rules(rules)

@@ -4,8 +4,14 @@ module AuthorizationSanTest
     
     def self.start
       load_dependencies
+      
       begin
-        ActionController::Routing::Routes.reload
+        if const_defined?(:ActionDispatch)
+          ActionDispatch::Routing::Routes.reload
+        else
+          ActionController::Routing::Routes.reload
+        end
+        require 'active_support/core_ext/proc'
       rescue
       end
     end

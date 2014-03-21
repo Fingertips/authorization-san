@@ -41,13 +41,20 @@ namespace :test do
     t.test_files = test_files
     t.verbose = true
   end
+
+  desc 'Test the plugin with Rails 4.0.'
+  Rake::TestTask.new(:rails40) do |t|
+    t.libs += %w(test test/test_helper/rails4.0)
+    t.test_files = test_files
+    t.verbose = true
+  end
 end
 
 desc 'Run all tests'
 if RUBY_VERSION < '2.0.0'
   task :test => ['test:rails2', 'test:rails3', 'test:rails31', 'test:rails32']
 else
-  task :test => ['test:rails32']
+  task :test => ['test:rails32', 'test:rails40']
 end
 
 namespace :docs do
