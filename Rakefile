@@ -57,12 +57,14 @@ else
   task :test => ['test:rails32', 'test:rails40']
 end
 
-namespace :docs do
-  Rake::RDocTask.new('generate') do |rdoc|
-    rdoc.title = 'Authorization-San'
-    rdoc.main = "README.rdoc"
-    rdoc.rdoc_files.include('README.rdoc', 'lib/authorization')
-    rdoc.options << "--all" << "--charset" << "utf-8"
+if defined?(Rake::RDocTask)
+  namespace :docs do
+    Rake::RDocTask.new('generate') do |rdoc|
+      rdoc.title = 'Authorization-San'
+      rdoc.main = "README.rdoc"
+      rdoc.rdoc_files.include('README.rdoc', 'lib/authorization')
+      rdoc.options << "--all" << "--charset" << "utf-8"
+    end
   end
 end
 
