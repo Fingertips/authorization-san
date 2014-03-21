@@ -20,6 +20,10 @@ Authorization-san allows you to specify access policies in your controllers. The
 
 The best place to start learning more is the <tt>examples</tt> directory in the source.
 
+== Will it run?
+
+Authorization-San runs on all Ruby on Rails versions above 2.3 and their supported Ruby versions.
+
 == Contributers
 
 In order of appearance:
